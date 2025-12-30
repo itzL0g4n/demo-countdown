@@ -57,8 +57,13 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
     window.addEventListener('mouseout', handleMouseLeave);
 
     // --- HEAVY PHYSICS ENGINE ---
-    const numParticles = 5000; 
+    const numParticles = 6000; 
     const particles: Dot[] = [];
+
+    // Helper for uniform distribution
+    let distributionStep = 0;
+    let distributionBuffer = 200; // Extra space to prevent edge gaps
+    let totalVirtualWidth = 0;
 
     class Dot {
       x: number;
@@ -76,8 +81,17 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
       mass: number;     // Determines resistance
       density: number;  // For time-based shifting
       
-      constructor() {
-        this.baseX = Math.random() * width;
+      constructor(index: number) {
+        // UNIFORM DISTRIBUTION FIX:
+        // Instead of random X, we place them on a perfect grid.
+        // This guarantees no large voids exist in the array.
+        const perfectX = (index * distributionStep) - (distributionBuffer / 2);
+        
+        // Add a tiny bit of noise so it doesn't look like a barcode, 
+        // but small enough (±1.5px) that it can't create a visible gap.
+        const microNoise = (Math.random() - 0.5) * 3;
+        
+        this.baseX = perfectX + microNoise;
         this.x = this.baseX;
         
         const rand = (Math.random() + Math.random() + Math.random() + Math.random() - 2); 
@@ -93,27 +107,36 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
       }
 
       update(time: number, secondPulse: number, minuteSnap: number, hourShift: number, frozen: boolean) {
+        // 1. Global Drift
+        this.baseX += 0.2; 
+        
+        // SEAMLESS WRAPPING FIX:
+        // Instead of resetting to -10, we subtract the exact total width.
+        // This preserves the relative distance to the neighbor particles.
+        if (this.baseX > width + distributionBuffer) {
+            this.baseX -= totalVirtualWidth;
+            this.x -= totalVirtualWidth; 
+        }
+
         if (frozen) {
-            // RESOLUTION STATE (Magnetic Snap):
+            // RESOLUTION STATE:
             
-            // 1. Target Y - Flatten to a dense stripe
-            // Restored to 0.1 offset for a slightly thicker, more robust line
+            // Target Y - Flatten to a dense stripe
             const targetY = (height / 2) + (this.baseOffsetY * 0.1);
-            
-            // 2. Strong Spring Force (Vertical)
-            // Restored to 0.05 (High Tension) to make it "stick together like magnets"
             const dy = targetY - this.y;
             this.vy += dy * 0.05; 
 
-            // 3. Strong Spring Force (Horizontal - GAP FIX)
-            // This snaps particles back to their original flow position (baseX), 
-            // instantly closing any holes created by the mouse or drift.
+            // Target X - Snap to the drifting baseX (which is now perfectly uniform)
             const targetX = this.baseX;
             const dx = targetX - this.x;
-            this.vx += dx * 0.05;
 
-            // 4. Friction (Bounce)
-            // Restored to 0.90 to allow controlled, energetic wobble without loose drift
+            // Only spring if close (safety check for wrapping artifacts)
+            if (Math.abs(dx) < 200) {
+                this.vx += dx * 0.05;
+            } else {
+                this.vx *= 0.5;
+            }
+
             this.vx *= 0.90; 
             this.vy *= 0.90; 
 
@@ -122,14 +145,7 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
             return;
         }
 
-        // 1. Slow Idle Drift (Global movement)
-        this.baseX += 0.15; // Constant slow flow
-        if (this.baseX > width) {
-          this.baseX = -10;
-          this.x = -10; // Teleport to avoid snap
-        }
-
-        // 2. Calculate Target Position
+        // 2. Calculate Target Position (Wave)
         const waveFreq = 0.002 + (hourShift * 0.0005);
         const waveAmp = (height * 0.1) + (hourShift * 20);
         
@@ -196,10 +212,24 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
       }
     }
 
-    // Initialize
-    for (let i = 0; i < numParticles; i++) {
-        particles.push(new Dot());
-    }
+    const initParticles = () => {
+        particles.length = 0;
+        
+        // Calculate uniform step
+        // We add extra width buffer to the screen width so wrapping happens off-screen
+        const buffer = 200; 
+        distributionBuffer = buffer;
+        const totalW = width + buffer;
+        totalVirtualWidth = totalW;
+        
+        distributionStep = totalW / numParticles;
+
+        for (let i = 0; i < numParticles; i++) {
+            particles.push(new Dot(i));
+        }
+    };
+    
+    initParticles();
 
     // --- ANIMATION LOOP ---
     let animationId: number;
@@ -272,10 +302,7 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
 
     const handleResize = () => {
         setSize();
-        particles.length = 0;
-        for (let i = 0; i < numParticles; i++) {
-            particles.push(new Dot());
-        }
+        initParticles();
     };
 
     window.addEventListener('resize', handleResize);
