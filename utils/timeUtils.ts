@@ -1,10 +1,8 @@
 import { TimeLeft } from '../types';
 
-// UTC+7 (Hanoi/Bangkok)
-const TARGET_OFFSET = 7 * 60 * 60 * 1000; 
-
-// TEST MODE: Set target to 12 seconds from now to test the end state immediately.
-const TARGET_DATE = new Date().getTime() + 12000; 
+// Target: January 1, 2026, 00:00:00 (Hanoi/Bangkok - UTC+7)
+// In UTC, this corresponds to December 31, 2025 at 17:00:00
+const TARGET_DATE = new Date(Date.UTC(2025, 11, 31, 17, 0, 0)).getTime();
 
 export const calculateTimeLeft = (): TimeLeft | null => {
   const now = new Date().getTime();
