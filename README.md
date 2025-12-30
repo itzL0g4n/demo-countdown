@@ -2,7 +2,7 @@
 
 A stunning, atmospheric, and real-time countdown to the year 2026, synchronized to the Indochina Time (ICT) zone (Hanoi/Bangkok). This project blends high-end typography, particle physics simulations, and generative AI to create a unique "New Year" anticipation experience.
 
-![Project Preview](https://demo-countdown.vercel.app/)
+![Project Preview]([https://demo-countdown.vercel.app/](https://raw.githubusercontent.com/itzL0g4n/demo-countdown/refs/heads/main/demo.gif))
 
 ## ✨ Features
 
