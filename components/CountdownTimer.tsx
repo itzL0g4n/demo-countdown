@@ -69,14 +69,12 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ onComplete }) =>
 
   // Preserve layout height during fade/wait to avoid jumps
   if (phase === 'waiting') {
-      return <div className="h-[240px] md:h-32 w-full"></div>;
+      return <div className="h-32 w-full"></div>;
   }
 
   return (
     <div 
-        className={`w-full border-t border-b border-black/10 py-8 md:py-12 transition-opacity duration-500 ease-out 
-        grid grid-cols-2 gap-y-12 gap-x-4 md:flex md:justify-between md:gap-0
-        ${phase === 'fading-out' ? 'opacity-0' : 'opacity-100'}`}
+        className={`flex justify-between w-full border-t border-b border-black/10 py-8 md:py-12 transition-opacity duration-500 ease-out ${phase === 'fading-out' ? 'opacity-0' : 'opacity-100'}`}
     >
         {timeLeft ? (
             <>
@@ -90,7 +88,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ onComplete }) =>
             </>
         ) : (
             // Fallback for initial render before effect if time is technically 0 but state not updated
-            <div className="h-[240px] md:h-32 w-full"></div>
+            <div className="h-32 w-full"></div>
         )}
     </div>
   );
@@ -104,7 +102,7 @@ interface TimerUnitProps {
 const TimerUnit: React.FC<TimerUnitProps> = ({ value, label }) => {
   return (
     <div className="flex flex-col items-center justify-center flex-1">
-      <span className="text-6xl md:text-7xl font-display font-bold text-charcoal tabular-nums tracking-tight leading-none">
+      <span className="text-4xl md:text-7xl font-display font-bold text-charcoal tabular-nums tracking-tight">
         {formatNumber(value)}
       </span>
       <span className="mt-2 text-[10px] md:text-xs font-sans uppercase tracking-[0.25em] text-charcoal/50">
