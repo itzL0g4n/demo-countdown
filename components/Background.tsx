@@ -83,12 +83,7 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
       
       constructor(index: number) {
         // UNIFORM DISTRIBUTION FIX:
-        // Instead of random X, we place them on a perfect grid.
-        // This guarantees no large voids exist in the array.
         const perfectX = (index * distributionStep) - (distributionBuffer / 2);
-        
-        // Add a tiny bit of noise so it doesn't look like a barcode, 
-        // but small enough (±1.5px) that it can't create a visible gap.
         const microNoise = (Math.random() - 0.5) * 3;
         
         this.baseX = perfectX + microNoise;
@@ -110,11 +105,11 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
         // 1. Global Drift
         this.baseX += 0.2; 
         
-        // SEAMLESS WRAPPING FIX:
-        // Instead of resetting to -10, we subtract the exact total width.
-        // This preserves the relative distance to the neighbor particles.
+        // SEAMLESS WRAPPING:
         if (this.baseX > width + distributionBuffer) {
             this.baseX -= totalVirtualWidth;
+            // Snap x as well to maintain relative physics state, 
+            // but we rely on wave calc using this.x to avoid visual jumps
             this.x -= totalVirtualWidth; 
         }
 
@@ -126,11 +121,10 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
             const dy = targetY - this.y;
             this.vy += dy * 0.05; 
 
-            // Target X - Snap to the drifting baseX (which is now perfectly uniform)
+            // Target X - Snap to the drifting baseX
             const targetX = this.baseX;
             const dx = targetX - this.x;
 
-            // Only spring if close (safety check for wrapping artifacts)
             if (Math.abs(dx) < 200) {
                 this.vx += dx * 0.05;
             } else {
@@ -149,7 +143,10 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
         const waveFreq = 0.002 + (hourShift * 0.0005);
         const waveAmp = (height * 0.1) + (hourShift * 20);
         
-        const waveY = Math.sin(this.baseX * waveFreq + time * 0.0001) * waveAmp;
+        // GAP FIX: Use this.x (screen position) instead of this.baseX for wave Y calculation.
+        // This ensures that the wave is continuous across the screen, so when a particle wraps,
+        // it enters at the correct Y height for its new screen position.
+        const waveY = Math.sin(this.x * waveFreq + time * 0.0001) * waveAmp;
         const currentOffsetY = this.baseOffsetY * (1 - minuteSnap * 0.8);
         
         const targetY = (height / 2) + waveY + currentOffsetY;
@@ -206,6 +203,9 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
       }
 
       draw(ctx: CanvasRenderingContext2D) {
+        // Optimization: Don't draw if off screen
+        if (this.x < -10 || this.x > width + 10) return;
+
         const alpha = 0.55 + (Math.abs(this.baseOffsetY) / 60) * -0.3; 
         ctx.fillStyle = `rgba(26, 26, 26, ${Math.max(0.2, alpha)})`;
         ctx.fillRect(this.x, this.y, 2.2, 2.2); 
@@ -215,8 +215,6 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
     const initParticles = () => {
         particles.length = 0;
         
-        // Calculate uniform step
-        // We add extra width buffer to the screen width so wrapping happens off-screen
         const buffer = 200; 
         distributionBuffer = buffer;
         const totalW = width + buffer;
@@ -240,12 +238,10 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
       
       const frozen = isCompleteRef.current;
 
-      // Only advance time if not frozen (stops wave movement)
       if (!frozen) {
         absoluteTime += 16.67;
       }
 
-      // 1. Time Events Logic
       const now = new Date();
       const s = now.getSeconds();
       const m = now.getMinutes();
@@ -265,7 +261,6 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
       timeState.current.secondPulse *= 0.9; 
       timeState.current.minuteSnap *= 0.98; 
 
-      // 2. Mouse Inertia Logic
       if (!frozen && mouse.current.x > -100) {
         const dx = mouse.current.x - laggedMouse.current.x;
         const dy = mouse.current.y - laggedMouse.current.y;
@@ -281,7 +276,6 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
         laggedMouse.current.y = -1000;
       }
 
-      // 3. Update Particles
       const hourShift = (h % 12) / 12;
 
       particles.forEach(p => {
@@ -313,7 +307,7 @@ export const Background: React.FC<BackgroundProps> = ({ isComplete }) => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseout', handleMouseLeave);
     };
-  }, []); // Empty dependency array, ref handles updates
+  }, []);
 
   return (
     <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
