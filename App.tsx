@@ -67,6 +67,18 @@ export default function App() {
         </div>
 
       </div>
+
+      {/* Fixed Footer */}
+      <footer className="fixed bottom-3 w-full flex justify-center z-50 pointer-events-auto">
+        <a 
+          href="https://www.facebook.com/tom.boc.xi.mang" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-[10px] text-charcoal/30 hover:text-charcoal/80 font-mono tracking-widest uppercase transition-colors duration-300 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full border border-white/10"
+        >
+          © TomBocXiMang
+        </a>
+      </footer>
     </main>
   );
 }
