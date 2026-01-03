@@ -7,6 +7,6 @@ export interface TimeLeft {
 
 export enum PredictionType {
   MOTIVATION = 'Motivation',
-  FORTUNE = '2026 Fortune',
+  FORTUNE = '2027 Fortune',
   RESOLUTION = 'Resolution',
 }

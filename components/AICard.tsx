@@ -47,7 +47,7 @@ export const AICard: React.FC = () => {
                 {loading ? (
                     <div className="flex items-center space-x-3 text-charcoal/50">
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <TextScramble text="Connecting to 2026 timeline..." />
+                        <TextScramble text="Connecting to 2027 timeline..." />
                     </div>
                 ) : prediction ? (
                     <p className="text-lg md:text-xl font-serif text-charcoal leading-snug">

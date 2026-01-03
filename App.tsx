@@ -30,7 +30,7 @@ export default function App() {
             <span>Hanoi / Bangkok</span>
           </div>
           <div className="hidden md:block text-xs font-mono text-charcoal/40">
-             TARGET: 2026.01.01
+             TARGET: 2027.01.01
           </div>
         </header>
 
@@ -44,11 +44,11 @@ export default function App() {
                </h2>
             </div>
             
-            {/* Static, Heavy 2026 Text */}
+            {/* Static, Heavy 2027 Text */}
             <h1 
               className="text-[15vw] md:text-[10rem] leading-[0.85] font-display font-extrabold text-charcoal tracking-tighter mix-blend-multiply select-none cursor-default"
             >
-              2026
+              2027
             </h1>
           </div>
 

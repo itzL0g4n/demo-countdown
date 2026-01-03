@@ -9,13 +9,13 @@ export const getFuturePrediction = async (type: PredictionType): Promise<string>
     
     switch(type) {
       case PredictionType.MOTIVATION:
-        prompt = "Give me a short, inspiring New Year's wish for someone entering 2026. Focus on hope, success, and new beginnings. Keep it poetic and under 30 words.";
+        prompt = "Give me a short, inspiring New Year's wish for someone entering 2027. Focus on hope, success, and new beginnings. Keep it poetic and under 30 words.";
         break;
       case PredictionType.FORTUNE:
-        prompt = "Act as a mystical fortune teller. Predict a positive, lucky event that will happen to the user in 2026. Be whimsical and magical. Keep it under 35 words.";
+        prompt = "Act as a mystical fortune teller. Predict a positive, lucky event that will happen to the user in 2027. Be whimsical and magical. Keep it under 35 words.";
         break;
       case PredictionType.RESOLUTION:
-        prompt = "Suggest a sophisticated and meaningful New Year's Resolution for 2026. Focus on personal growth, elegance, or mindfulness. Keep it under 25 words.";
+        prompt = "Suggest a sophisticated and meaningful New Year's Resolution for 2027. Focus on personal growth, elegance, or mindfulness. Keep it under 25 words.";
         break;
     }
 

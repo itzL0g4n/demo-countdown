@@ -1,8 +1,8 @@
 import { TimeLeft } from '../types';
 
-// Target: January 1, 2026, 00:00:00 (Hanoi/Bangkok - UTC+7)
-// In UTC, this corresponds to December 31, 2025 at 17:00:00
-const TARGET_DATE = new Date(Date.UTC(2025, 11, 31, 17, 0, 0)).getTime();
+// Target: January 1, 2027, 00:00:00 (Hanoi/Bangkok - UTC+7)
+// In UTC, this corresponds to December 31, 2026 at 17:00:00
+const TARGET_DATE = new Date(Date.UTC(2026, 11, 31, 17, 0, 0)).getTime();
 
 export const calculateTimeLeft = (): TimeLeft | null => {
   const now = new Date().getTime();
